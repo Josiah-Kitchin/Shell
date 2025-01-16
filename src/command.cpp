@@ -3,6 +3,7 @@
 #include <cstring> 
 #include <unistd.h>
 #include <iostream> 
+#include <cstdlib>
 
 static bool is_bg_process(const std::vector<std::string>& args) { 
     return !args.empty() && args.back().back() == '&';
@@ -28,8 +29,8 @@ static std::vector<char*> get_cstr_args(const std::vector<std::string>& args) {
 
 
 Command::Command(const std::string& program, std::vector<std::string> args) : 
-    no_command(false), exit(false), is_wave_program(false),
-    is_background_process(false), m_program(program){
+    no_command(false), exit(false), is_background_process(false), 
+    is_wave_program(false), m_program(program){
     
     if (m_program == "") { 
         no_command = true; 
@@ -58,5 +59,6 @@ void Command::execute() const {
     std::vector<char*> c_args = get_cstr_args(m_args);
     if (execvp(m_program.c_str(), c_args.data()) == -1) { 
         std::cerr << "Command \"" << m_program << "\" not found\n";
+        std::exit(EXIT_FAILURE); 
     }
 }

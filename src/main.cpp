@@ -2,15 +2,9 @@
 
 #include <string> 
 #include <iostream> 
-#include <unistd.h> 
-#include <cstdlib> 
 #include "process.hpp"
 #include "command.hpp"
 #include "interface.hpp"
-
-#define PATH_MAX 200
-#define HOST_NAME_MAX 100
-
 
 int main() { 
 

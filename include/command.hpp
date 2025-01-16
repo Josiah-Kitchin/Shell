@@ -28,6 +28,7 @@ public:
     bool no_command; //empty program string
     bool exit;  //if the command was to exit 
     bool is_background_process; //& symbol at the end of the arguments 
+    bool is_wave_program;  //if the program to run is a built in wave program 
 
     void execute() const;
 

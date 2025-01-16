@@ -8,7 +8,7 @@ void spawn_command_process(const Command& command) {
     /* Mages proccesses and executes command, being built in shell commands or binarys */ 
     
     if (command.no_command) return; 
-    if (command.exit) exit(EXIT_SUCCESS);
+    if (command.exit) std::exit(EXIT_SUCCESS);
 
     if (command.is_wave_program) { 
         command.execute(); 
