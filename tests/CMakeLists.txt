@@ -3,7 +3,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(test_wave_shell CXX)
 
-
 file(GLOB_RECURSE SOURCES "../src/*.cpp")
 list(FILTER SOURCES EXCLUDE REGEX "main.cpp$")
 file(GLOB TEST_SOURCES "*.cpp") 

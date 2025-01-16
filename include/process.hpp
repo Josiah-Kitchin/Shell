@@ -1,10 +1,7 @@
 
 #pragma once
-#include <vector> 
-#include <string> 
+#include "command.hpp"
 
-/*
- * Manges processes and executes a command given a line of arguments 
- */
 
-void execute_command(std::vector<std::string> args);  
+//Spawns a new process to execute a command 
+void spawn_command_process(const Command& command);  
