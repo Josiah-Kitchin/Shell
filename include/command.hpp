@@ -39,7 +39,6 @@ private:
 
 };
 
-Command build_command(const std::string& line);
 
 
 

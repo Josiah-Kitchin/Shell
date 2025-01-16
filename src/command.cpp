@@ -6,12 +6,16 @@
 #include <cstdlib>
 
 static bool is_bg_process(const std::vector<std::string>& args) { 
-    return !args.empty() && args.back().back() == '&';
+    return !args.empty() && (args.back() == "&" || args.back().back() == '&');
 }
 
 static void remove_bg_process_symbol(std::vector<std::string>& args) { 
     /* Remove the & symbol */ 
-    args.back().pop_back();  
+    if (args.back() == "&") {  
+        args.pop_back();  
+    } else { 
+        args.back().pop_back(); 
+    }
 }
 
 static std::vector<char*> get_cstr_args(const std::vector<std::string>& args) { 
@@ -49,6 +53,7 @@ Command::Command(const std::string& program, std::vector<std::string> args) :
 
     m_args = std::move(args);
 }
+
 
 void Command::execute() const { 
     if (is_wave_program) { 
