@@ -12,7 +12,7 @@ int main() {
         std::cout << get_interface_line(); 
         std::getline(std::cin, line);
         SyntaxTree tree(line);
-        tree.run_proccesses(); 
+        tree.run_commands(); 
     }
 
     return 0; 
