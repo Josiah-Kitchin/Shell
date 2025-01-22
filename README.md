@@ -1,7 +1,4 @@
-# Wave-Shell
-Shell for UNIX machines
-
-# C++ Shell
+# Wave Shell
 
 This project is a custom shell implementation in C++ for UNIX machines that supports command execution, piping, and logical operators.
 
