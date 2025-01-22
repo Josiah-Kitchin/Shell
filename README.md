@@ -9,8 +9,6 @@ This project is a custom shell implementation in C++ for UNIX machines that supp
 - **Logical Operators (`&&` and `||`):** Conditional execution based on command success or failure.
 - **Built-in Commands:** Includes basic built-in commands like `cd`, `exit`.
 
-## Installation
-
 ### Prerequisites
 
 - C++ compiler (GCC/Clang/MSVC) with C++17 or later support.
