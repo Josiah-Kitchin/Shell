@@ -5,10 +5,12 @@
 #include "command.hpp"
 #include <memory> 
 
-enum class Token { COMMAND, PIPE }; 
+enum class Token { COMMAND, PIPE, AND, OR }; 
 
 namespace op { 
     const std::string PIPE = "|";
+    const std::string AND = "&&";
+    const std::string OR = "||";
 }
 
 struct TokenNode { 
@@ -31,13 +33,15 @@ class SyntaxTree {
 
 public: 
     SyntaxTree(const std::string& command_line);
-    void run_proccesses(); 
+    void run_commands(); 
 
 private: 
     std::shared_ptr<TokenNode> m_root; 
-    void run_proccesses(const std::shared_ptr<TokenNode>& root_token); 
-    void spawn_command_process(const Command &command);
+    void run_commands(const std::shared_ptr<TokenNode>& root_token); 
+    void run_command(const Command& command);
     void pipe_command(const std::shared_ptr<TokenNode>& root_token);
+    void and_command(const std::shared_ptr<TokenNode>& node);
+    void or_command(const std::shared_ptr<TokenNode>& node);
 
 };
 

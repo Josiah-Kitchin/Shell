@@ -3,6 +3,7 @@
 #include <sstream> 
 #include <cassert> 
 #include "syntax_tree.hpp"
+#include <iostream> 
 
 
 std::vector<std::string> tokenize(const std::string &line) { 
@@ -40,7 +41,18 @@ std::shared_ptr<TokenNode> build_syntax_tree(const std::vector<std::string>& tok
             pipe_node->left = command_node; 
             pipe_node->right = build_syntax_tree(std::vector<std::string>(tokens.begin() + i + 1, tokens.end()));
             return pipe_node; 
-        } else { 
+        } else if (tokens[i] == op::AND) { 
+            auto and_node = std::make_shared<TokenNode>(Token::AND);
+            and_node->left = command_node; 
+            and_node->right = build_syntax_tree(std::vector<std::string>(tokens.begin() + i + 1, tokens.end()));
+            return and_node; 
+        } else if (tokens[i] == op::OR) { 
+            auto or_node = std::make_shared<TokenNode>(Token::OR);
+            or_node->left = command_node; 
+            or_node->right = build_syntax_tree(std::vector<std::string>(tokens.begin() + i + 1, tokens.end()));
+            return or_node;
+        } 
+        else { 
             command_node->command_line.push_back(tokens[i]);
         }
     }
