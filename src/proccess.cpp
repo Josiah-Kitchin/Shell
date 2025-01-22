@@ -6,6 +6,9 @@
 
 
 Process Process::spawn() { 
+    /* Spawn a chlid and parent process 
+     * Exits with failure code on failure */  
+
     pid_t pid = fork(); 
     if (pid == -1) { 
         std::cerr << "Failed to spawn process\n";
@@ -25,6 +28,7 @@ bool Process::is_parent() {
 }
 
 void Process::wait_for_child() { 
+    /* Blocks parent process until child exits */ 
     int status; 
     waitpid(m_pid, &status, 0);
     m_status = status; 
