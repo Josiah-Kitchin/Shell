@@ -4,14 +4,19 @@
 #include <string> 
 #include "command.hpp"
 #include <memory> 
+#include <unordered_map>
+
+/* ---------- Tokens ---------- */ 
 
 enum class Token { COMMAND, PIPE, AND, OR }; 
 
-namespace op { 
-    const std::string PIPE = "|";
-    const std::string AND = "&&";
-    const std::string OR = "||";
-}
+const std::unordered_map<std::string, Token> token_map = {
+    {"|", Token::PIPE},
+    {"&&", Token::AND},
+    {"||", Token::OR},
+};
+
+Token get_token(const std::string&);
 
 struct TokenNode { 
     TokenNode(Token type); 
@@ -24,6 +29,8 @@ struct TokenNode {
     std::vector<std::string> command_line; 
 };
 
+/* ------------------------------- */
+
 class SyntaxTree { 
 /* The syntax tree class is responsible for running the proccesses. 
  * The syntax tree is a binary tree holding token nodes. The leafs of the tree are commands, while 
@@ -32,16 +39,16 @@ class SyntaxTree {
  * according to the parent operator */ 
 
 public: 
-    SyntaxTree(const std::string& command_line);
-    void run_commands(); 
+    SyntaxTree(const std::string& command_line); //takes the command line written by the user 
+    void run_commands(); //interface functions to run commands at the root 
 
 private: 
     std::shared_ptr<TokenNode> m_root; 
-    void run_commands(const std::shared_ptr<TokenNode>& root_token); 
-    void run_command(const Command& command);
-    void pipe_command(const std::shared_ptr<TokenNode>& root_token);
-    void and_command(const std::shared_ptr<TokenNode>& node);
-    void or_command(const std::shared_ptr<TokenNode>& node);
+    void run_commands(const std::shared_ptr<TokenNode>& root_token); //recursivly run commands and follow operators 
+    void run_command(const Command& command); //execute a single command 
+    void pipe_command(const std::shared_ptr<TokenNode>& root_token); //redirect output of left child command to right child command
+    void and_command(const std::shared_ptr<TokenNode>& node); //executes right child command if left child was successfull
+    void or_command(const std::shared_ptr<TokenNode>& node); //executes right child command if left child was unsuccesfull
 
 };
 

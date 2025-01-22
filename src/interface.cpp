@@ -7,6 +7,8 @@ constexpr int HOST_NAME_MAX = 100;
 constexpr int PATH_MAX = 100; 
 
 std::string get_interface_line() {
+    /* Returns a string that will be seen by the user when using wave shell */ 
+
     std::string interface_line = "\033[39;1m";
 
     const char* username = getenv("USER");
