@@ -78,12 +78,8 @@ void SyntaxTree::pipe_command(const std::shared_ptr<TokenNode>& root_token) {
     }
 
     // left command (write to pipe)
-    pid_t left_pid = fork(); 
-    if (left_pid == -1) {
-        std::cerr << "Fork failed\n";
-        std::exit(EXIT_FAILURE);
-    }
-    if (left_pid == 0) { 
+    auto left_process = Process::spawn(); 
+    if (left_process.is_child()) { 
         dup2(pipefd[1], STDOUT_FILENO);  // redirect stdout to pipe write end
         close(pipefd[0]);  // close unused read end
         close(pipefd[1]);  // close duplicate write end
@@ -92,12 +88,9 @@ void SyntaxTree::pipe_command(const std::shared_ptr<TokenNode>& root_token) {
     }
 
     // right command (read from pipe)
-    pid_t right_pid = fork(); 
-    if (right_pid == -1) {
-        perror("fork failed");
-        std::exit(EXIT_FAILURE);
-    }
-    if (right_pid == 0) { 
+    auto right_process = Process::spawn(); 
+
+    if (right_process.is_child()) { 
         dup2(pipefd[0], STDIN_FILENO);  // redirect stdin to pipe read end
         close(pipefd[1]);  // close unused write end
         close(pipefd[0]);  // close duplicate read end
@@ -108,8 +101,8 @@ void SyntaxTree::pipe_command(const std::shared_ptr<TokenNode>& root_token) {
     // parent process
     close(pipefd[0]);
     close(pipefd[1]);
-    waitpid(left_pid, nullptr, 0);
-    waitpid(right_pid, nullptr, 0);
+    left_process.wait_for_child(); 
+    right_process.wait_for_child(); 
 } 
 
 void SyntaxTree::and_command(const std::shared_ptr<TokenNode>& node) { 
@@ -120,17 +113,17 @@ void SyntaxTree::and_command(const std::shared_ptr<TokenNode>& node) {
         //run child normally
         run_commands(node->left);
         std::exit(EXIT_SUCCESS);
-    } else { 
-        //parent, spawn a right child process if the left exits successfully
-        left_process.wait_for_child(); 
-        if (left_process.exited() && left_process.exited_successfully()) {
-            auto right_process= Process::spawn(); 
-            if (right_process.is_child()) {
-                run_commands(node->right);
-                std::exit(EXIT_SUCCESS);
-            } else { 
-                right_process.wait_for_child(); 
-            }
+    }  
+
+    //parent, spawn a right child process if the left exits successfully
+    left_process.wait_for_child(); 
+    if (left_process.exited() && left_process.exited_successfully()) {
+        auto right_process= Process::spawn(); 
+        if (right_process.is_child()) {
+            run_commands(node->right);
+            std::exit(EXIT_SUCCESS);
+        } else { 
+            right_process.wait_for_child(); 
         }
     }
 }
@@ -143,17 +136,17 @@ void SyntaxTree::or_command(const std::shared_ptr<TokenNode>& node) {
         //run child normally
         run_commands(node->left);
         std::exit(EXIT_SUCCESS);
-    } else { 
-        //parent, spawn a right child process if the left exits successfully
-        left_process.wait_for_child(); 
-        if (left_process.exited() && !left_process.exited_successfully()) {
-            auto right_process= Process::spawn(); 
-            if (right_process.is_child()) {
-                run_commands(node->right);
-                std::exit(EXIT_SUCCESS);
-            } else { 
-                right_process.wait_for_child(); 
-            }
+    }  
+
+    //parent, spawn a right child process if the left exits unsuccessfully
+    left_process.wait_for_child(); 
+    if (left_process.exited() && !left_process.exited_successfully()) {
+        auto right_process= Process::spawn(); 
+        if (right_process.is_child()) {
+            run_commands(node->right);
+            std::exit(EXIT_SUCCESS);
+        } else { 
+            right_process.wait_for_child(); 
         }
     }
 }
