@@ -44,28 +44,13 @@ std::shared_ptr<TokenNode> build_syntax_tree(const std::vector<std::string>& tok
     auto command_node = std::make_shared<TokenNode>(Token::COMMAND); 
     for (size_t i = 0; i < tokens.size(); ++i) { 
         Token type = get_token(tokens[i]);
-        switch (type) { 
-            case(Token::PIPE): { 
-                auto pipe_node = std::make_shared<TokenNode>(Token::PIPE);
-                pipe_node->left = command_node; 
-                pipe_node->right = build_syntax_tree(std::vector<std::string>(tokens.begin() + i + 1, tokens.end()));
-                return pipe_node; 
-            }
-            case (Token::AND): {
-                auto and_node = std::make_shared<TokenNode>(Token::AND);
-                and_node->left = command_node; 
-                and_node->right = build_syntax_tree(std::vector<std::string>(tokens.begin() + i + 1, tokens.end()));
-                return and_node; 
-            }
-            case (Token::OR): { 
-                auto or_node = std::make_shared<TokenNode>(Token::OR);
-                or_node->left = command_node; 
-                or_node->right = build_syntax_tree(std::vector<std::string>(tokens.begin() + i + 1, tokens.end()));
-                return or_node;
-            }
-            default: 
-                command_node->command_line.push_back(tokens[i]);
-        }
+        if (type != Token::COMMAND) { 
+            auto operator_node = std::make_shared<TokenNode>(type);
+            operator_node->left = command_node; 
+            operator_node->right = build_syntax_tree(std::vector<std::string>(tokens.begin() + i + 1, tokens.end()));
+            return operator_node; 
+        } 
+        command_node->command_line.push_back(tokens[i]);
     }
     return command_node; 
 }

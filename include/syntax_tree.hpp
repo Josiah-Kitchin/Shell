@@ -8,12 +8,15 @@
 
 /* ---------- Tokens ---------- */ 
 
-enum class Token { COMMAND, PIPE, AND, OR }; 
+enum class Token { COMMAND, PIPE, AND, OR, OUTPUT_RIGHT, OUTPUT_LEFT, APPEND_RIGHT}; 
 
 const std::unordered_map<std::string, Token> token_map = {
     {"|", Token::PIPE},
     {"&&", Token::AND},
     {"||", Token::OR},
+    {">", Token::OUTPUT_RIGHT},
+    {"<", Token::OUTPUT_LEFT},
+    {">>", Token::APPEND_RIGHT},
 };
 
 Token get_token(const std::string&);
@@ -49,6 +52,9 @@ private:
     void pipe_command(const std::shared_ptr<TokenNode>& root_token); //redirect output of left child command to right child command
     void and_command(const std::shared_ptr<TokenNode>& node); //executes right child command if left child was successfull
     void or_command(const std::shared_ptr<TokenNode>& node); //executes right child command if left child was unsuccesfull
+    /*void output_right_command(const std::shared_ptr<TokenNode>& node);*/
+    /*void output_left_command(const std::shared_ptr<TokenNode>& node);*/
+    /*void append_right_command(const std::shared_ptr<TokenNode>& node);*/
 
 };
 
