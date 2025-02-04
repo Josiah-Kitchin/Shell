@@ -260,4 +260,3 @@ void SyntaxTree::run_seperate_commands(const std::shared_ptr<TokenNode>& node) {
 
 
 
-

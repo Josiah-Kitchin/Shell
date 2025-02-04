@@ -13,14 +13,22 @@ Token get_token(const std::string& input) {
     return Token::COMMAND; 
 }
 
-std::vector<std::string> tokenize(const std::string &line) { 
+
+std::vector<std::string> tokenize(const std::string& line) { 
     /* Transform the string into a vector of tokens */ 
     std::vector<std::string> words; 
     std::stringstream stream(line);
     std::string word; 
 
     while (stream >> word) { 
-        words.push_back(word);
+        //Set ; to be a seperate token 
+        if (word.back() == ';') { 
+            word.pop_back(); 
+            words.push_back(word);
+            words.push_back(";");
+        } else { 
+            words.push_back(word);
+        }
     }
 
     return words; 
