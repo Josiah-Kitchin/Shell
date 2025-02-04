@@ -36,12 +36,12 @@ Command::Command(const std::string& program, std::vector<std::string> args) :
     no_command(false), exit(false), is_background_process(false), 
     is_wave_program(false), m_program(program){
     
-    if (m_program == "") { 
+    if (m_program == "")  
         no_command = true; 
-    }
-    if (m_program == "exit") { 
+
+    if (m_program == "exit")  
         exit = true; 
-    }
+    
     if (is_bg_process(args)) { 
         is_background_process = true; 
         remove_bg_process_symbol(args);

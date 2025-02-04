@@ -30,6 +30,18 @@ void SyntaxTree::run_commands(const std::shared_ptr<TokenNode>& node) {
         case Token::OR: 
             or_command(node);
             break;
+        case Token::REDIR_STDOUT: 
+            redir_stdout_command(node);
+            break; 
+        case Token::REDIR_STDIN: 
+            redir_stdin_command(node);
+            break; 
+        case Token::REDIR_APPEND_STDOUT: 
+            redir_append_stdout_command(node);
+            break; 
+        case Token::COMMAND_SEPERATOR: 
+            run_seperate_commands(node);
+            break; 
     }
 }
 
@@ -110,12 +122,12 @@ void SyntaxTree::and_command(const std::shared_ptr<TokenNode>& node) {
 
     auto left_process = Process::spawn(); 
     if (left_process.is_child()) {
-        //run child normally
+        // Run child normally
         run_commands(node->left);
         std::exit(EXIT_SUCCESS);
     }  
 
-    //parent, spawn a right child process if the left exits successfully
+    // Parent, spawn a right child process if the left exits successfully
     left_process.wait_for_child(); 
     if (left_process.exited() && left_process.exited_successfully()) {
         auto right_process= Process::spawn(); 
@@ -138,7 +150,7 @@ void SyntaxTree::or_command(const std::shared_ptr<TokenNode>& node) {
         std::exit(EXIT_SUCCESS);
     }  
 
-    //parent, spawn a right child process if the left exits unsuccessfully
+    // Parent, spawn a right child process if the left exits unsuccessfully
     left_process.wait_for_child(); 
     if (left_process.exited() && !left_process.exited_successfully()) {
         auto right_process= Process::spawn(); 
@@ -150,5 +162,102 @@ void SyntaxTree::or_command(const std::shared_ptr<TokenNode>& node) {
         }
     }
 }
+
+void SyntaxTree::redir_stdout_command(const std::shared_ptr<TokenNode>& node) { 
+    /* Redirect the left node stdout to the right node file */ 
+
+    auto process = Process::spawn(); 
+    if (process.is_child()) { 
+
+        std::vector<std::string> input = node->right->command_line; 
+        if (input.size() != 1) { 
+            std::cout << "Syntax error: \"<\" Needs one input\n";
+            std::exit(EXIT_FAILURE);
+        }
+        std::freopen(input.at(0).c_str(), "w", stdout);
+        run_commands(node->left);
+        std::fclose(stdout);
+        std::exit(EXIT_SUCCESS);
+    }
+
+    if (process.is_parent()) { 
+        process.wait_for_child(); 
+    }
+}
+
+
+void SyntaxTree::redir_stdin_command(const std::shared_ptr<TokenNode>& node) { 
+    /* Redirect the right node file into the left node stdin */ 
+
+    auto process = Process::spawn(); 
+    if (process.is_child()) { 
+
+        std::vector<std::string> input = node->right->command_line; 
+        if (input.size() != 1) { 
+            std::cout << "Syntax error: \"<\" Needs one input\n";
+            std::exit(EXIT_FAILURE);
+        }
+
+        std::freopen(input.at(0).c_str(), "r", stdin);
+        run_commands(node->left);
+        std::fclose(stdin);
+        std::exit(EXIT_SUCCESS);
+    }
+
+    if (process.is_parent()) { 
+        process.wait_for_child(); 
+    }
+}
+
+void SyntaxTree::redir_append_stdout_command(const std::shared_ptr<TokenNode>& node) { 
+    /* Redirect the left nodes output to the right node file */ 
+
+    auto process = Process::spawn(); 
+    if (process.is_child()) { 
+
+        std::vector<std::string> input = node->right->command_line; 
+        if (input.size() != 1) { 
+            std::cout << "Syntax error: \">>\" Needs one input\n";
+            std::exit(EXIT_FAILURE);
+        }
+
+        std::freopen(input.at(0).c_str(), "a", stdout);
+        run_commands(node->left);
+        std::fclose(stdout);
+        std::exit(EXIT_SUCCESS);
+    }
+
+    if (process.is_parent()) { 
+        process.wait_for_child(); 
+    }
+}
+
+void SyntaxTree::run_seperate_commands(const std::shared_ptr<TokenNode>& node) { 
+    /* Run two commands with no condition */ 
+
+    auto left_process = Process::spawn(); 
+    if (left_process.is_child()) {
+        run_commands(node->left);
+        std::exit(EXIT_SUCCESS);
+    }  
+
+    if (left_process.is_parent()) { 
+        left_process.wait_for_child(); 
+        // Left process complete, complete right process
+        
+        auto right_process = Process::spawn(); 
+        if (right_process.is_child()) { 
+            run_commands(node->right);
+            std::exit(EXIT_SUCCESS);
+        }
+
+        if (right_process.is_parent()) { 
+            right_process.wait_for_child(); 
+        }
+    }
+}
+
+
+
 
 

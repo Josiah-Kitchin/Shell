@@ -8,15 +8,25 @@
 
 /* ---------- Tokens ---------- */ 
 
-enum class Token { COMMAND, PIPE, AND, OR, OUTPUT_RIGHT, OUTPUT_LEFT, APPEND_RIGHT}; 
+enum class Token { 
+    COMMAND, 
+    PIPE, 
+    AND, 
+    OR, 
+    REDIR_STDOUT, 
+    REDIR_STDIN, 
+    REDIR_APPEND_STDOUT,
+    COMMAND_SEPERATOR
+}; 
 
 const std::unordered_map<std::string, Token> token_map = {
     {"|", Token::PIPE},
     {"&&", Token::AND},
     {"||", Token::OR},
-    {">", Token::OUTPUT_RIGHT},
-    {"<", Token::OUTPUT_LEFT},
-    {">>", Token::APPEND_RIGHT},
+    {">", Token::REDIR_STDOUT},
+    {"<", Token::REDIR_STDIN},
+    {">>", Token::REDIR_APPEND_STDOUT},
+    {";", Token::COMMAND_SEPERATOR},
 };
 
 Token get_token(const std::string&);
@@ -52,9 +62,10 @@ private:
     void pipe_command(const std::shared_ptr<TokenNode>& root_token); //redirect output of left child command to right child command
     void and_command(const std::shared_ptr<TokenNode>& node); //executes right child command if left child was successfull
     void or_command(const std::shared_ptr<TokenNode>& node); //executes right child command if left child was unsuccesfull
-    /*void output_right_command(const std::shared_ptr<TokenNode>& node);*/
-    /*void output_left_command(const std::shared_ptr<TokenNode>& node);*/
-    /*void append_right_command(const std::shared_ptr<TokenNode>& node);*/
+    void redir_stdout_command(const std::shared_ptr<TokenNode>& node); //redirect output of left command to a file 
+    void redir_stdin_command(const std::shared_ptr<TokenNode>& node); //redirect right file to input of left command 
+    void redir_append_stdout_command(const std::shared_ptr<TokenNode>& node); //redirect output of left command to append to a file 
+    void run_seperate_commands(const std::shared_ptr<TokenNode>& node); // Run left node and right node with no conditions 
 
 };
 
